@@ -1,0 +1,372 @@
+/*En un Centro Médico se tienen registrados los datos de pacientes que se atienden allí semanalmente en una secuencia de caracteres, teniendo en cuenta que el Centro permanece abierto los Lunes, Martes y Viernes.
+
+Por cada paciente se tienen los siguientes datos: número historia clínica (una palabra de 4 caracteres numéricos), nombre del paciente (una cadena de caracteres que finaliza en “-”), número para indicar el tipo de especialidad por la cual se atiende (un número entre 10 y 29, para indicar por ejemplo: 10: pediatría, 11: traumatología, etc.), código indicador del tipo de cobertura de salud que tiene ese paciente (un número entre 0 y 9 por ejemplo: 0: particular, 1: plan de salud propio del centro, 2: obra social, etc.), y el día de la semana que se atendió el paciente (L, M, V).
+
+Se pide que desarrolles un algoritmo que ofrezca un menú con las siguientes opciones:
+1. Separar los datos almacenados por día de atención y ordenados por Nro. de Historia Clínica.
+lunes
+1 2 3 4 5 
+martes 
+1 2 3 4 5
+
+2. Buscar un paciente determinado informando, en caso de encontrarlo, la especialidad que se atendió y qué día de la semana.
+
+3. Informar:
+   - La cantidad de pacientes atendidos por especialidad y tipo de cobertura.
+   - Cuál es el tipo de cobertura que menos se ha atendido en el Centro.
+   - Cuál es la especialidad más requerida.
+[]
+Nota:
+- Las estructuras de datos a utilizar queda a criterio de cada estudiante en función de eficiencia y eficacia.
+- Puedes usar la función CONCATENAR.
+- Es recomendable el uso de subacciones para organizar el pseudocódigo.*/
+
+ACCION primer_ejercicio ES
+    Ambiente
+        sec: secuencia de caracter
+        v:caracter
+
+         pacientes = registro
+            dia : ("L","M","V")
+            HClinica:n(4)
+            nombre:an(50)
+            especialidad: 10..29
+            cobertura:0..9
+            prox:puntero a pacientes
+         fin_registro
+      prim,p,q, ant :puntero a pacientes 
+      cobertura :arreglo de [0..9] de entero
+      especialidad :arreglo de [0..19] de entero
+
+      nombre_cob :arreglo de [0..9] de alfanumerico
+      nombre_esp :arreglo de [0..19] de alfanumerico
+      funcion convertir_num(c:caracter):entero ES
+         segun c hacer:
+            "0": convertir_num:= 0
+            "1": convertir_num:= 1
+            "2": convertir_num:= 2
+            "3": convertir_num:= 3
+            "4": convertir_num:= 4
+            "5": convertir_num:= 5
+            "6": convertir_num:= 6
+            "7": convertir_num:= 7
+            "8": convertir_num:= 8
+            "9": convertir_num:= 9
+         fin_segun
+      fin_funcion 
+
+      PROCEDIMIENTO ordenarpordia(p:puntero a pacientes) ES
+         segun p hacer:
+            "L":ordenarpordia:=1
+            "M":ordenarpordia:=2
+            "V":ordenarpordia:=3
+         fin_segun
+              
+      FIN_PROCEDIMIENTO
+         
+    Proceso
+         ARR(sec)
+         AVANZAR(sec, v)
+
+         PARA i := 0 HASTA 9 HACER
+            cobertura[i] := 0             
+         FIN_PARA
+         PARA i := 0 HASTA 19 HACER
+            especialidad[i] := 0             
+         FIN_PARA
+
+         prim, p:= nill
+         mientras NFDS(sec) hacer
+            num:=0
+            nuevo (q)
+
+            q.HClinica:= 0
+            para i:=1 hasta 4 hacer
+               q.HClinica:=:= q.HClinica*10 + convertir_num(v)
+               AVZ(sec, v)
+            fin_para
+
+            q.nombre:="" 
+            mientras v <> "-" hacer 
+               AVZ(sec,v)
+               q.nombre:= concatenar(q.nombre,v)
+            fin_mientras
+            AVZ(sec, v)
+            
+            num_esp:= convertir_num(v)
+            AVZ(sec, v)
+            num_esp:= num_esp*10 + convertir_num(v)
+            q.especialidad:= num_esp
+            especialidad[q.especialidad-10]:= especialidad[q.especialidad-10]+1
+            
+            AVZ(sec, v)
+            q.cobertura:= convertir_num(v)
+            cobertura[q.cobertura]:= cobertura[q.cobertura]+1
+
+            AVZ(sec, v)
+            q.dia:= v
+            
+            p:=prim 
+            ant:=nill            
+            mientras p <> nill Y orden_dia(*p.dia) < orden_dia(*q.dia) hacer 
+               ant:= p 
+               p= *p.prox
+            fin_mientras 
+              
+            si ant = nill entonces
+               *q.prox:= prim 
+               prim:= q 
+            sino 
+               si orden_dia(*p.dia) < orden_dia(*q.dia) Y p <> nill hacer
+                  mientras p.HClinica < q.HClinica Y p.dia = q.dia Y p <> nill hacer
+                     ant:= p
+                     p:= *p.prox
+                  fin_mientras
+               fin_si
+               *ant.prox:= q 
+               *q.prox := p 
+            fin_si
+         fin_mientras
+
+         menor_cobertura:= hv
+         ESCRIBIR("Para la cobertura: ")
+         PARA i := 0 HASTA 9 HACER
+            ESCRIBIR(nombre_cob[i], " se atendieron ", cobertura[i], " pacientes")
+            si cobertura[i] < menor_cobertura entonces
+               menor_cobertura:= cobertura[i]
+               indice:= i
+            fin_si
+         FIN_PARA
+         ESCRIBIR("En la cobertura " nombre_cob[indice], " se atendieron menos pacientes (", cobertura[indice], ")")
+
+         mayor_especialidad:=lv
+         ESCRIBIR("Para la especialidad")
+         PARA i := 0 HASTA 19 HACER
+            ESCRIBIR(nombre_esp[i], " se atendieron ", especialidad[i], " pacientes")
+            si especialidad[i] > mayor_especialidad entonces
+               mayor_especialidad:= especialidad[i]
+               indice:= i
+            fin_si            
+         FIN_PARA
+         ESCRIBIR("La especialidad " nombre_esp[indice], " es la más requerida por ", especialidad[indice], " pacientes")
+
+   CERRAR(sec)
+FIN_ACCION
+
+
+/*
+Ejercicio N° 2
+
+La Federación Internacional de Atletismo (World Athletics) desea generar estadísticas del campeonato mundial de relevos. 
+Se dispone del archivo secuencial PARTICIPACIONES_ATLETISMO, ordenado por País, Equipo, con la siguiente estructura:
+
+País|Equipo|Atleta|Disciplina (“100m” – “200m” – “4x100” – “4x400”)|Tiempo (seg)|Descalificado (“Sí” – “No”)
+
+Se solicita:
+
+1. Informar el tiempo total por país, por equipo y el total general del torneo, considerando solo las participaciones no 
+descalificadas.
+
+2. Informar cuántos atletas fueron descalificados por equipo.
+
+Generar un archivo de salida llamado RELEVOS_RAPIDOS que contenga el País y el Tiempo Total de relevos (solo disciplinas 
+“4x100” o “4x400”), solo si el equipo logró un tiempo acumulado inferior a 160 segundos en estas disciplinas.
+Para este archivo, considerar únicamente atletas no descalificados.
+*/
+
+
+
+
+
+
+ejercicio 2
+
+ACCION ejer_2 ES
+    Ambiente
+      r = Registro
+        pais:AN(30)
+        equipo:AN(30)
+        atleta:AN(50)
+        disciplina:("100m","200m" "4x100","4x400")
+        tiemposeg:N(3)
+        descalificado:("SI","NO")
+      Fin_Registro
+
+      participaciones: archivo de r ordenado por pais y equipo
+      reg:r
+      s = registro
+         pais:AN(30)
+         tiempo_total:n(4)
+      fin_sal
+      salida: archivo de sal 
+      s:sal
+      cont_equipo,cont_descalificado,cont_pais,cont_total,acum4 :entero
+      resg_equipo:AN(30)
+      resg_pais:AN30
+      PROCEDIMIENTO corte_equipo() ES
+         escribir("el tiempo total del equipo", reg_equipo," es de ", cont_equipo)
+         escribir("la cantidad de atletas descalificado del equipo son: ", cont_descalificado)
+         cont_pais:= cont_pais+cont_equipo
+         si acum4 < 160 entonces
+            sal.pais:= reg_pais
+            sal.tiempo_total:= acum4
+            escribir(salida,sal)
+         fin_si 
+         acum4:= 0
+         cont_equipo:=0
+         cont_descalificado:=0
+         resg_equipo:=reg.equipo
+
+          
+              
+      FIN_PROCEDIMIENTO
+
+      procedimiento corte_pais() ES
+         corte_equipo()
+         escribir("el timepo total del pais ", resg_pais, "es de ", cont_pais)
+         cont_total:=cont_total+cont_pais
+         cont_pais:=0
+         resg_pais:=reg.pais
+         
+
+
+      FIN_procedimiento
+      
+
+
+    Proceso
+      ABRIR E/(participaciones);LEER(participaciones,reg) 
+      ABRIR /S(salida)
+      resg_equipo:= reg.equipo
+      resg_pais:=reg.pais
+      cont_equipo:=0
+      cont_descalificado:=0
+      cont_pais:=0
+      cont_total:=0
+      acum4:=0
+      mientras nfda(participaciones) hacer
+         si reg.pais <> resg_pais entonces
+            corte_pais()
+         sino
+            si reg.equipo <> reg_equipo entonces
+               corte_equipo()
+            fin_si
+         fin_si
+         si reg.descalificados = "no" ENTONCES
+            cont_equipo:= cont_equipo+reg.tiemposeg
+            si reg.disciplina = "4x100" o reg.disciplina = "4x400" entonces
+               acum4:=acum4+reg.tiemposeg
+         sino 
+            cont_descalificado:=cont_descalificado+1
+         fin_si
+         leer(participaciones,reg)
+      fin_mientras
+      corte_pais
+
+      escribir("el tiempo total general del torneo es de ", cont_total, " segundos")
+      CERRAR(participaciones)
+      CERRAR(sal)
+FIN_ACCION
+/*
+Ejercicio N° 3
+
+Un número casi-perfecto se define como aquel número natural n tal que la suma de sus divisores propios (excluyendo al propio 
+número) es exactamente n − 1.
+
+Por ejemplo:
+
+Divisores propios de 16: 1, 2, 4, 8 → suma: 15 ⇒ 16 es casi-perfecto.
+
+Divisores propios de 10: 1, 2, 5 → suma: 8 ⇒ 10 no es casi-perfecto.
+20 1 2 4 5 10 
+
+Se solicita desarrollar una función que cumpla con lo siguiente:
+
+Solicite al usuario un rango de dos valores enteros positivos A y B, tales que A < B.
+
+Para cada número entre A y B, determine si es casi-perfecto.
+
+Informe al finalizar la cantidad total de números casi-perfectos encontrados.
+*/
+
+
+
+ACCION ejer_3 ES
+    Ambiente
+
+         A,B,num,cont:entero
+        FUNCION escasi_perfecto(n:entero):boleano ES
+            Ambiente
+               suma:entero 
+               divisor:entero
+            Proceso
+            suma:=0
+
+            para divisor:=1 hasta n-1 hacer 
+               si n mod divisor = 0 entonces
+                  suma:=suma+divisor
+               fin_si
+            fin_para
+            si  suma = n-1 entonces 
+               escasi_perfecto:= verdadero
+            sino
+               escasi_perfecto:= falso
+            fin_si              
+                
+        FIN_FUNCION
+    Proceso
+        escribir("ingrese un numero")
+        leer(A)
+        escribir("ingrese otro numero mayor al anterior")
+        leer(B)
+        num:=A
+        cont:=0
+         para num:= A HASTA B HACER
+            si escasi_perfecto(num) entonces
+               cont:=cont+1
+            fin_si
+         fin_para
+         escribir("la cantidad de numeros encotrados es " , cont)
+FIN_ACCION
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
